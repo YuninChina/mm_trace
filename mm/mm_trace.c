@@ -84,9 +84,10 @@ void mm_show(void)
 	}
 }
 
-void task_mm_show(const char *name)
+void task_name_mm_show(const char *name)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
+	unsigned long sum = 0;
 	printf("\n\n=========================================== task_mm_show ===========================================\n");
 	printf("%-20s%-20s%-20s%-20s\n","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
@@ -95,13 +96,17 @@ void task_mm_show(const char *name)
 			printf("%-20s %-20d %-20p %-20d \n",
 			node->info.func,node->info.line,
 			node->info.addr,node->info.size);
+			sum += node->info.size;
 		}
 	}
+	printf(">>>>>> sum:%u \n\n",sum);
 }
 
-void task_mm_show2(unsigned long id)
+void task_id_mm_show(unsigned long id)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
+	
+	unsigned long sum = 0;
 	printf("\n\n=========================================== task_mm_show2 ===========================================\n");
 	printf("%-20s %-20s %-20s %-20s\n","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
@@ -110,7 +115,15 @@ void task_mm_show2(unsigned long id)
 			printf("%-20s %-20d %-20p %-20d \n",
 			node->info.func,node->info.line,
 			node->info.addr,node->info.size);
+			sum += node->info.size;
 		}
 	}
+	printf(">>>>>> sum:%u \n\n",sum);
+}
+
+
+void task_mm_show(void)
+{
+
 }
 
