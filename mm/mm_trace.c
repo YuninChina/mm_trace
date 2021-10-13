@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include <assert.h>
 
 #include "mm_trace.h"
 #include "klist.h"
@@ -33,7 +34,7 @@ void *mm_malloc(const char *func,unsigned long line,unsigned long size)
 	pthread_t thread_id = 0;
 	addr = malloc(size);
 	assert(addr);
-	node = malloc(*node);
+	node = malloc(sizeof(*node));
 	assert(node);
 	thread_id = pthread_self();
 	pthread_getname_np(thread_id,node->info.task_name,sizeof(node->info.task_name));

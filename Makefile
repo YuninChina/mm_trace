@@ -120,7 +120,7 @@ export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP RANLIB CFLAGS LDFLAGS MERGE_LDFL
 
 TEST_CFLAGS ?= ${CFLAGS}
 LINK_PATH := -L libs
-LD_LIBS := -lmtlib -lpthread -lm -lrt
+LD_LIBS := -lmm_trace -lpthread -lm -lrt
 PLATFORM_LIBS :=
 
 ifeq ($(CONFIG_SOC),T31)
@@ -136,8 +136,8 @@ endif
 
 export TEST_CFLAGS LINK_PATH LD_LIBS
 
-MAKEFILE_BUILD := script/Makefile.build
-MAKEFILE_TEST_BUILD := script/Makefile.test.build
+MAKEFILE_BUILD := scripts/Makefile.build
+MAKEFILE_TEST_BUILD := scripts/Makefile.test.build
 export MAKEFILE_BUILD MAKEFILE_TEST_BUILD
 
 dirs := mm/
@@ -173,7 +173,6 @@ all:  $(dirs) ${objs} build_comms_static_lib FORCE
 test_dirs := sample/
 test_dirs := ${patsubst %/,%,$(filter %/, $(test_dirs))}
 $(test_dirs): FORCE
-	cp sample/media bin/ -fr -d
 	@make -f ${MAKEFILE_TEST_BUILD}  obj=$@
 	
 test: $(test_dirs) FORCE
@@ -189,7 +188,6 @@ clean:	FORCE
 distclean: clean
 	@echo ">>> distclean target"
 	@rm -fr bin/ libs/ 
-	${shell for i in `find 3th/ -name *.tar.*`;do rm -fr ` echo $$i | sed 's/\(.*\).tar.\(.*\)/\1/g' `;done}
 
 help: 
 	@echo  'Cleaning targets:'
