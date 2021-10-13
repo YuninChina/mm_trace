@@ -16,6 +16,8 @@ typedef struct mm_info_s{
 	unsigned long line;
 	unsigned long size;
 	void *addr;
+	/* other */
+	unsigned long task_total_size;
 }mm_info_t;
 
 typedef struct mm_node_s{
@@ -43,9 +45,19 @@ void *mm_malloc(const char *func,unsigned long line,unsigned long size)
 	node->info.line = line;
 	node->info.size = size;
 	node->info.addr = addr;
+	node->info.task_total_size = 0;
 
 	pthread_mutex_lock(&mm_mutex);
 	list_add_tail(&node->list, &mm_list);
+	
+	mm_node_t *tmp = NULL,*tmp2 = NULL;
+	list_for_each_entry_safe(tmp, tmp2,&mm_list, list) {
+		if(0 == strcmp(node->info.task_name,tmp->info.task_name))
+		{
+			node->info.task_total_size += node->info.size;
+			tmp->info.task_total_size = node->info.task_total_size;
+		}
+	}
 	pthread_mutex_unlock(&mm_mutex);
 	
 	return addr;
@@ -124,6 +136,17 @@ void task_id_mm_show(unsigned long id)
 
 void task_mm_show(void)
 {
-
+	mm_node_t *node = NULL,*tmp = NULL;
+	const char *task_name = "UNKNOW";
+	printf("\n\n=========================================== mm_show ===========================================\n");
+	printf("%-20s %-20s %-20s\n","[task]","[id]","[size]");
+	list_for_each_entry_safe(node, tmp,&mm_list, list) {
+		if(0 != strcmp(task_name,node->info.task_name))
+		{
+			task_name = node->info.task_name;
+			printf("%-20s 0x%-20x %-20u\n",node->info.task_name,
+			node->info.task_id,node->info.task_total_size);
+		}
+	}
 }
 

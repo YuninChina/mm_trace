@@ -74,7 +74,7 @@ int main(void)
 	
 	while(1)
 	{
-		task_name_mm_show("task_no2");
+		task_mm_show();
 		sleep(1);
 		system("clear");
 	}

@@ -19,7 +19,7 @@ int main(void)
 	assert(p1);
 	mm_show();
 
-	task_mm_show("mm_trace");
+	task_name_mm_show("mm_trace");
 	///////////////
 	FREE(p3);
 	mm_show();
