@@ -73,28 +73,28 @@ void mm_free(void *addr)
 void mm_show(void)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
-	printf("\n\n===========================================\n");
+	printf("\n\n=========================================== mm_show ===========================================\n");
 	printf("%-20s %-20s %-20s %-20s %-20s %-20s\n",
 	"[task]","[id]","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
-		printf("%-20s %-10d %-32s %-10d %-10d %-10p \n",
+		printf("%-20s 0x%-20x %-20s %-20d %-20p %-20d\n",
 		node->info.task_name,node->info.task_id,
 		node->info.func,node->info.line,
-		node->info.size,node->info.addr);
+		node->info.addr,node->info.size);
 	}
 }
 
 void task_mm_show(const char *name)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
-	printf("\n\n===========================================\n");
-	printf("%-20s %-20s %-20s %-20s\n","[function]","[line]","[addr]","[size]");
+	printf("\n\n=========================================== task_mm_show ===========================================\n");
+	printf("%-20s%-20s%-20s%-20s\n","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
 		if(0 == strcmp(name,node->info.task_name))
 		{
-			printf("%-32s %-10d %-10d %-10p \n",
+			printf("%-20s %-20d %-20p %-20d \n",
 			node->info.func,node->info.line,
-			node->info.size,node->info.addr);
+			node->info.addr,node->info.size);
 		}
 	}
 }
@@ -102,14 +102,14 @@ void task_mm_show(const char *name)
 void task_mm_show2(unsigned long id)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
-	printf("\n\n===========================================\n");
+	printf("\n\n=========================================== task_mm_show2 ===========================================\n");
 	printf("%-20s %-20s %-20s %-20s\n","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
 		if(id == node->info.task_id)
 		{
-			printf("%-32s %-10d %-10d %-10p \n",
+			printf("%-20s %-20d %-20p %-20d \n",
 			node->info.func,node->info.line,
-			node->info.size,node->info.addr);
+			node->info.addr,node->info.size);
 		}
 	}
 }
