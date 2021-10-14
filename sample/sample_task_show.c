@@ -74,10 +74,9 @@ int main(void)
 	
 	while(1)
 	{
-		mm_show();
+		system("clear");
 		task_mm_show();
-		sleep(1);
-		//system("clear");
+		usleep(1000*10);
 	}
 	
 	return 0;

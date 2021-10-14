@@ -76,10 +76,10 @@ void mm_show(void)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
 	printf("\n\n=========================================== mm_show ===========================================\n");
-	printf("%-15s %-15s %-15s %-15s %-15s %-15s %-15s\n",
+	printf("%-15s %-15s %-15s %-32s %-15s %-15s %-15s\n",
 	"[task]","[tid]","[pid]","[function]","[line]","[addr]","[size]");
 	list_for_each_entry_safe(node, tmp,&mm_list, list) {
-		printf("%-15s %-15u %-15u %-15s %-15d %-15p %-15d\n",
+		printf("%-15s %-15u %-15u %-32s %-15d %-15p %-15d\n",
 		node->info.task_name,node->info.tid,node->info.pid,
 		node->info.func,node->info.line,
 		node->info.addr,node->info.size);
@@ -132,7 +132,7 @@ void task_mm_show(void)
 	FILE *fp = NULL;
     char buf[1024] = {0,};
     char *pResult = NULL;
-    unsigned long task_id = 0;
+    unsigned long task_pid = 0;
 	int i = 0;
 	unsigned long mem_size = 0;
 	const char *task_name = NULL;
@@ -148,8 +148,8 @@ void task_mm_show(void)
     fp = NULL;
     //printf("%s\n",buf);
     
-	printf("\n\n=========================================== mm_show ===========================================\n");
-	printf("%-20s %-20s %-20s\n","[task]","[id]","[size]");
+	printf("\n\n=========================================== task_mm_show ===========================================\n");
+	printf("%-20s %-20s %-20s\n","[task]","[task_pid]","[size]");
 	
     char *sub = NULL,*str = NULL;
 	str = buf;
@@ -157,20 +157,20 @@ void task_mm_show(void)
 		sub = strtok(str," ");
 		if(NULL == sub)
 			break;
-		sscanf(str,"%u",&task_id);
-		//printf("task_id: %d\n",task_id);
+		sscanf(str,"%u",&task_pid);
+		//printf("task_pid: %d\n",task_pid);
 		str += (strlen(sub)+1);
 
 		///////////////////////////////
 		mem_size = 0;
 		list_for_each_entry_safe(node, tmp,&mm_list, list) {
-			if(task_id == node->info.tid)
+			if(task_pid == node->info.pid)
 			{
 				mem_size += node->info.size;
 				task_name = node->info.task_name;
 			}
 		}
-		printf("%-20s 0x%-20x %-20u\n",task_name,task_id,mem_size);
+		printf("%-20s %-20u %-20u\n",task_name,task_pid,mem_size);
 	} while(1);
 	
     #if 0
