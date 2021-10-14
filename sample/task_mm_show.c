@@ -76,7 +76,7 @@ int main(void)
 	{
 		system("clear");
 		task_mm_show();
-		usleep(1000*10);
+		usleep(1000*1000);
 	}
 	
 	return 0;
