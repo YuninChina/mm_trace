@@ -74,9 +74,10 @@ int main(void)
 	
 	while(1)
 	{
+		mm_show();
 		task_mm_show();
 		sleep(1);
-		system("clear");
+		//system("clear");
 	}
 	
 	return 0;
