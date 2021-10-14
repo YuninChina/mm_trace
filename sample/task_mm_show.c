@@ -20,10 +20,7 @@ static void *task_routine_no1(void *arg)
 		p = MALLOC((cnt+1)*16);
 		sleep(1);
 		cnt++;
-		if(0 == cnt%3)
-		{
-			FREE(p);
-		}
+		
 	}
 	return NULL;
 }
@@ -38,10 +35,37 @@ static void *task_routine_no2(void *arg)
 		p = MALLOC((cnt+1)*512);
 		sleep(1);
 		cnt++;
-		if(0 == cnt%2)
-		{
-			FREE(p);
-		}
+	}
+	return NULL;
+}
+
+
+static void *task_routine_normal(void *arg)
+{
+	prctl(PR_SET_NAME,"task_normal");
+	int cnt = 0;
+	void *p = NULL;
+	while (1)
+	{
+		p = MALLOC((cnt+1)*2048);
+		cnt++;
+		FREE(p);
+		sleep(1);
+	}
+	return NULL;
+}
+
+
+static void *task_routine_dummy(void *arg)
+{
+	prctl(PR_SET_NAME,"task_dummy");
+	int cnt = 0;
+	void *p = NULL;
+	while (1)
+	{
+		p = MALLOC((cnt+1)*64);
+		cnt++;
+		sleep(1);
 	}
 	return NULL;
 }
@@ -62,6 +86,7 @@ int main(void)
 
 	
 	pthread_t thread_id1,thread_id2;
+	pthread_t thread_id3,thread_id4;
 	int ret = -1;
 	
 	ret = pthread_create(&thread_id1, NULL, task_routine_no1, (void *)NULL);
@@ -71,12 +96,29 @@ int main(void)
 	ret = pthread_create(&thread_id2, NULL, task_routine_no2, (void *)NULL);
 	assert(0 == ret);
 	pthread_detach(thread_id2);
+
+	
+	ret = pthread_create(&thread_id3, NULL, task_routine_normal, (void *)NULL);
+	assert(0 == ret);
+	pthread_detach(thread_id3);
+
+	
+	ret = pthread_create(&thread_id4, NULL, task_routine_dummy, (void *)NULL);
+	assert(0 == ret);
+	pthread_detach(thread_id4);
 	
 	while(1)
 	{
 		system("clear");
 		task_mm_show();
 		usleep(1000*1000);
+
+		if(cnt++ == 10)
+		{
+			FREE(p1);
+			FREE(p2);
+			FREE(p3);
+		}
 	}
 	
 	return 0;

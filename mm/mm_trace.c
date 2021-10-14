@@ -72,6 +72,28 @@ void mm_free(void *addr)
 	}
 }
 
+
+const char *task_name_get(unsigned long ppid,unsigned long pid,char *buf,unsigned int buf_size)
+{
+#define TASK_NAME_CMD "cat /proc/%d/task/%d/status | grep Name | xargs | sed 's/Name: \\(.*\\)/\\1/g'"
+	char cmd[1024] = {0,};
+	FILE *fp = NULL;
+	char *p_ret = NULL;
+	memset(cmd,0,sizeof(cmd));
+    snprintf(cmd,sizeof(cmd),TASK_NAME_CMD,ppid,pid);
+    //printf("+++ %s\n",cmd);
+    fp = popen (cmd, "r");
+    assert(fp);
+	memset(buf,0,buf_size);
+	p_ret = fgets (buf, buf_size, fp);
+    assert(p_ret);
+    fclose(fp);
+    fp = NULL;
+    buf[strlen(buf)-1] = 0;  //去掉最后换行符.
+    //printf(">>> %s (%d)\n",buf,strlen(buf));
+    return buf;
+}
+
 void mm_show(void)
 {
 	mm_node_t *node = NULL,*tmp = NULL;
@@ -132,7 +154,7 @@ void task_mm_show(void)
 	FILE *fp = NULL;
     char buf[1024] = {0,};
     char *pResult = NULL;
-    unsigned long task_pid = 0;
+    unsigned long task_pid = 0,task_tid = 0;
 	int i = 0;
 	unsigned long mem_size = 0;
 	const char *task_name = NULL;
@@ -149,7 +171,7 @@ void task_mm_show(void)
     //printf("%s\n",buf);
     
 	printf("\n\n=========================================== task_mm_show ===========================================\n");
-	printf("%-20s %-20s %-20s\n","[task]","[task_pid]","[size]");
+	printf("%-20s %-20s %-20s\n","[task]","[task_pid]","[task_tid]","[size]");
 	
     char *sub = NULL,*str = NULL;
 	str = buf;
@@ -158,32 +180,30 @@ void task_mm_show(void)
 		if(NULL == sub)
 			break;
 		sscanf(str,"%u",&task_pid);
-		//printf("task_pid: %d\n",task_pid);
+		//printf("pid=%d, task_pid: %d\n",pid,task_pid);
 		str += (strlen(sub)+1);
 
 		///////////////////////////////
 		mem_size = 0;
+		task_name = NULL;
 		list_for_each_entry_safe(node, tmp,&mm_list, list) {
 			if(task_pid == node->info.pid)
 			{
 				mem_size += node->info.size;
 				task_name = node->info.task_name;
+				task_tid = node->info.tid;
 			}
 		}
-		printf("%-20s %-20u %-20u\n",task_name,task_pid,mem_size);
+		//printf("mem_size: %d\n",mem_size);
+		if(0 == mem_size)
+		{
+			char tname[64] = {0,};
+			memset(tname,0,sizeof(tname));
+			task_name = task_name_get(pid,task_pid,tname,sizeof(tname));
+			task_tid = (unsigned long)-1;
+		}
+		printf("%-20s %-20u %-20x %-20u\n",task_name,task_pid,task_tid,mem_size);
 	} while(1);
 	
-    #if 0
-	printf("\n\n=========================================== mm_show ===========================================\n");
-	printf("%-20s %-20s %-20s\n","[task]","[id]","[size]");
-	list_for_each_entry_safe(node, tmp,&mm_list, list) {
-		if(0 != strcmp(task_name,node->info.task_name))
-		{
-			task_name = node->info.task_name;
-			printf("%-20s 0x%-20x %-20u\n",node->info.task_name,
-			node->info.task_id,node->info.task_total_size);
-		}
-	}
-	#endif
 }
 
